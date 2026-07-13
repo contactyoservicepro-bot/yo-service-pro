@@ -10,7 +10,7 @@
 
     <!-- HEADER -->
     <header class="header">
-    <a href="index.html" class="logo">
+    <a href="index.php" class="logo">
         <img src="logo.png" alt="YoService Pro">
     </a>
 
