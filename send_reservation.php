@@ -1,5 +1,6 @@
 <?php
 session_start();
+require("resend.php");
 
 // 1️⃣ RÉCUPÉRATION DES DONNÉES DU FORMULAIRE
 $nom        = $_POST['nom'];
@@ -10,7 +11,7 @@ $prestation = $_POST['prestation'];
 $date       = $_POST['date'];
 $message    = $_POST['message'] ?? "";
 
-$destinataire = "contact.yoservicepro@gmail.com";
+$destinataire_admin = "contact.yoservicepro@gmail.com";
 
 // ===============================
 // 2️⃣ CALCUL AUTOMATIQUE SELON LA PRESTATION
@@ -122,38 +123,55 @@ $nom_pdf_devis = creerDevisPDF(
 );
 
 // ===============================
-// 6️⃣ ENVOI VIA FORMSPREE (avec PDF)
+// 6️⃣ ENVOI EMAIL CLIENT VIA RESEND
 // ===============================
 
-$endpoint = "https://formspree.io/f/mvzeoqdk"; // ton endpoint Formspree
+$htmlClient = "
+<h2>Bonjour $nom 👋</h2>
+<p>Merci pour votre demande. Voici votre devis :</p>
 
-$curl = curl_init();
+<p><strong>Prestation :</strong> $prestation<br>
+<strong>Date souhaitée :</strong> $date<br>
+<strong>Détails :</strong><br>$details_tarif<br>
+<strong>Total :</strong> $prix_total €</p>
 
-curl_setopt_array($curl, [
-    CURLOPT_URL => $endpoint,
-    CURLOPT_POST => true,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POSTFIELDS => [
-        "nom"        => $nom,
-        "email"      => $email,
-        "telephone"  => $telephone,
-        "adresse"    => $adresse,
-        "prestation" => $prestation,
-        "date"       => $date,
-        "message"    => $message,
-        "details_tarif" => $details_tarif,
-        "prix_total" => $prix_total,
+<p>Vous pouvez accepter ou refuser votre devis :</p>
 
-        // Pièce jointe PDF
-        "file" => new CURLFile("client_data/devis/$email/$nom_pdf_devis", "application/pdf", $nom_pdf_devis)
+<p>
+<a href='https://yoservicepro.onrender.com/accepter_devis.php?email=".urlencode($email)."&devis=".urlencode($nom_pdf_devis)."' style='color:#007bff;'>Accepter le devis</a><br>
+<a href='https://yoservicepro.onrender.com/refuser_devis.php?email=".urlencode($email)."&devis=".urlencode($nom_pdf_devis)."' style='color:red;'>Refuser le devis</a>
+</p>
+
+<p>Yo'Service Pro</p>
+";
+
+$attachment = [
+    [
+        "filename" => $nom_pdf_devis,
+        "content" => base64_encode(file_get_contents("client_data/devis/$email/$nom_pdf_devis")),
+        "type" => "application/pdf"
     ]
-]);
+];
 
-$response = curl_exec($curl);
-curl_close($curl);
+sendResendEmail($email, "Votre devis - Yo'Service Pro", $htmlClient, $attachment);
 
 // ===============================
-// 7️⃣ ADMIN
+// 7️⃣ EMAIL ADMIN VIA RESEND
+// ===============================
+
+$htmlAdmin = "
+<h2>Nouvelle réservation</h2>
+<p><strong>Nom :</strong> $nom<br>
+<strong>Email :</strong> $email<br>
+<strong>Téléphone :</strong> $telephone<br>
+<strong>Prestation :</strong> $prestation<br>
+<strong>Total :</strong> $prix_total €</p>
+";
+
+sendResendEmail($destinataire_admin, "Nouvelle réservation", $htmlAdmin, $attachment);
+
+// ===============================
+// 8️⃣ ADMIN LOG
 // ===============================
 if (!is_dir("admin_data")) mkdir("admin_data");
 
@@ -162,7 +180,7 @@ file_put_contents("admin_data/reservations.txt",
 FILE_APPEND);
 
 // ===============================
-// 8️⃣ MESSAGE FINAL STYLÉ
+// 9️⃣ MESSAGE FINAL STYLÉ
 // ===============================
 echo '
 <div style="max-width:600px;margin:40px auto;padding:30px;background:#fff;border-radius:12px;
@@ -180,4 +198,5 @@ box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:Arial,sans-serif;text-align:ce
 </div>
 ';
 ?>
+
 
