@@ -1,162 +1,270 @@
 <?php
 session_start();
-if (!isset($_SESSION['admin_logged']) || $_SESSION['admin_logged'] !== true) {
+
+// Sécurité : admin connecté ?
+if (!isset($_SESSION['admin_logged'])) {
     header("Location: login_admin.php");
     exit;
 }
 
-function lireFichier($fichier) {
-    if (!file_exists($fichier)) return [];
-    return file($fichier, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+// Dossiers principaux
+$accounts_folder   = "client_data/accounts/";
+$reservations_root = "client_data/reservations/";
+$devis_root        = "client_data/devis/";
+$paiements_root    = "client_data/paiements/";
+
+// ===============================
+// 1️⃣ LISTE DES CLIENTS
+// ===============================
+$clients = [];
+if (is_dir($accounts_folder)) {
+    foreach (glob($accounts_folder . "*.json") as $file) {
+        $clients[] = json_decode(file_get_contents($file), true);
+    }
 }
 
-$reservations = lireFichier("admin_data/reservations.txt");
-$accepted     = lireFichier("admin_data/accepted.txt");
-$refused      = lireFichier("admin_data/refused.txt");
+// ===============================
+// 2️⃣ RÉSERVATIONS
+// ===============================
+$reservations = [];
+
+foreach (glob($reservations_root . "*", GLOB_ONLYDIR) as $client_dir) {
+    $email = basename($client_dir);
+
+    foreach (glob("$client_dir/*.txt") as $file) {
+        $reservations[] = [
+            "email" => $email,
+            "file" => basename($file),
+            "content" => nl2br(file_get_contents($file)),
+            "status" => json_decode(file_get_contents("$client_dir/status.json"), true)[basename($file)] ?? "pending"
+        ];
+    }
+}
+
+// ===============================
+// 3️⃣ DEVIS
+// ===============================
+$devis_list = [];
+
+foreach (glob($devis_root . "*", GLOB_ONLYDIR) as $client_dir) {
+    $email = basename($client_dir);
+
+    $status_file = "$client_dir/status.json";
+    $status = file_exists($status_file) ? json_decode(file_get_contents($status_file), true) : [];
+
+    foreach (glob("$client_dir/*.pdf") as $file) {
+        $name = basename($file);
+        $devis_list[] = [
+            "email" => $email,
+            "file" => $name,
+            "status" => $status[$name] ?? "pending",
+            "path" => $file
+        ];
+    }
+}
+
+// ===============================
+// 4️⃣ PAIEMENTS
+// ===============================
+$paiements = [];
+
+foreach (glob($paiements_root . "*", GLOB_ONLYDIR) as $client_dir) {
+    $email = basename($client_dir);
+
+    $file = "$client_dir/paiements.json";
+    if (file_exists($file)) {
+        foreach (json_decode(file_get_contents($file), true) as $p) {
+            $paiements[] = [
+                "email" => $email,
+                "montant" => $p["montant"],
+                "prestation" => $p["prestation"],
+                "date" => $p["date"],
+                "status" => $p["status"],
+                "facture" => $p["facture"]
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Admin - Yo'Service Pro</title>
+<title>Dashboard Admin - Yo'Service Pro</title>
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial;
-        background: #f0f2f5;
-        display: flex;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background: #eef1f5;
+    margin: 0;
+    padding: 0;
+}
 
-    /* Sidebar */
-    .sidebar {
-        width: 250px;
-        background: #1e1e2f;
-        color: white;
-        height: 100vh;
-        padding: 20px;
-        position: fixed;
-    }
-    .sidebar h2 {
-        margin-bottom: 30px;
-        font-size: 22px;
-        text-align: center;
-    }
-    .sidebar a {
-        display: block;
-        padding: 12px;
-        margin: 10px 0;
-        background: #2b2b40;
-        color: white;
-        text-decoration: none;
-        border-radius: 6px;
-        transition: 0.2s;
-    }
-    .sidebar a:hover {
-        background: #3a3a55;
-    }
+.header {
+    background: #343a40;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-    /* Main content */
-    .main {
-        margin-left: 270px;
-        padding: 30px;
-        width: 100%;
-    }
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
 
-    /* Cards */
-    .cards {
-        display: flex;
-        gap: 20px;
-    }
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        flex: 1;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        text-align: center;
-    }
-    .card h3 {
-        margin: 0;
-        font-size: 18px;
-    }
-    .card p {
-        font-size: 28px;
-        margin-top: 10px;
-        font-weight: bold;
-    }
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
 
-    /* Sections */
-    .section {
-        margin-top: 40px;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .section h2 {
-        margin-bottom: 20px;
-    }
-    .section ul {
-        list-style: none;
-        padding: 0;
-    }
-    .section li {
-        padding: 12px;
-        border-bottom: 1px solid #ddd;
-    }
+.card h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #333;
+}
+
+.status {
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.status.pending { background: #ffc107; color: #000; }
+.status.accepted { background: #28a745; color: white; }
+.status.refused { background: #dc3545; color: white; }
+
+.pdf-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.pdf-link:hover {
+    background: #0056d2;
+}
+
+.logout-btn {
+    display: block;
+    width: 200px;
+    margin: 40px auto;
+    padding: 12px;
+    background: #dc3545;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.logout-btn:hover {
+    background: #b52a3a;
+}
+
+.section-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #007bff;
+}
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="sidebar">
-    <h2>Yo'Service Pro</h2>
-    <a href="admin.php">Dashboard</a>
-    <a href="logout.php">Déconnexion</a>
+<div class="header">
+    Dashboard Administrateur — Yo'Service Pro
 </div>
 
-<div class="main">
-    <h1>Dashboard Admin</h1>
+<div class="container">
 
-    <div class="cards">
-        <div class="card">
-            <h3>Réservations</h3>
-            <p><?php echo count($reservations); ?></p>
-        </div>
-        <div class="card">
-            <h3>Devis Acceptés</h3>
-            <p><?php echo count($accepted); ?></p>
-        </div>
-        <div class="card">
-            <h3>Devis Refusés</h3>
-            <p><?php echo count($refused); ?></p>
-        </div>
+    <!-- CLIENTS -->
+    <div class="card">
+        <h3 class="section-title">👥 Liste des clients</h3>
+
+        <?php if (empty($clients)) { ?>
+            <p>Aucun client enregistré.</p>
+        <?php } else { ?>
+            <?php foreach ($clients as $c) { ?>
+                <p><strong><?php echo $c["nom"]; ?></strong> — <?php echo $c["email"]; ?></p>
+                <hr>
+            <?php } ?>
+        <?php } ?>
     </div>
 
-    <div class="section">
-        <h2>📌 Réservations reçues</h2>
-        <ul>
-            <?php foreach ($reservations as $r) echo "<li>$r</li>"; ?>
-        </ul>
+    <!-- RÉSERVATIONS -->
+    <div class="card">
+        <h3 class="section-title">📌 Réservations</h3>
+
+        <?php if (empty($reservations)) { ?>
+            <p>Aucune réservation.</p>
+        <?php } else { ?>
+            <?php foreach ($reservations as $r) { ?>
+                <p><strong><?php echo $r["email"]; ?></strong> — <?php echo $r["file"]; ?></p>
+                <p><?php echo $r["content"]; ?></p>
+                <span class="status <?php echo $r["status"]; ?>"><?php echo $r["status"]; ?></span>
+                <hr>
+            <?php } ?>
+        <?php } ?>
     </div>
 
-    <div class="section">
-        <h2>✔️ Devis acceptés</h2>
-        <ul>
-            <?php foreach ($accepted as $a) echo "<li>$a</li>"; ?>
-        </ul>
+    <!-- DEVIS -->
+    <div class="card">
+        <h3 class="section-title">📄 Devis</h3>
+
+        <?php if (empty($devis_list)) { ?>
+            <p>Aucun devis.</p>
+        <?php } else { ?>
+            <?php foreach ($devis_list as $d) { ?>
+                <p><strong><?php echo $d["email"]; ?></strong> — <?php echo $d["file"]; ?></p>
+                <span class="status <?php echo $d["status"]; ?>"><?php echo $d["status"]; ?></span>
+
+                <a class="pdf-link" href="<?php echo $d["path"]; ?>" target="_blank">
+                    📄 Télécharger
+                </a>
+                <hr>
+            <?php } ?>
+        <?php } ?>
     </div>
 
-    <div class="section">
-        <h2>❌ Devis refusés</h2>
-        <ul>
-            <?php foreach ($refused as $f) echo "<li>$f</li>"; ?>
-        </ul>
+    <!-- PAIEMENTS -->
+    <div class="card">
+        <h3 class="section-title">💳 Paiements</h3>
+
+        <?php if (empty($paiements)) { ?>
+            <p>Aucun paiement.</p>
+        <?php } else { ?>
+            <?php foreach ($paiements as $p) { ?>
+                <p><strong><?php echo $p["email"]; ?></strong></p>
+                <p>Montant : <?php echo $p["montant"]; ?> €</p>
+                <p>Prestation : <?php echo $p["prestation"]; ?></p>
+                <p>Date : <?php echo $p["date"]; ?></p>
+                <p>Status : <?php echo $p["status"]; ?></p>
+
+                <a class="pdf-link" href="client_data/factures/<?php echo $p["email"]; ?>/<?php echo $p["facture"]; ?>" target="_blank">
+                    📄 Facture
+                </a>
+                <hr>
+            <?php } ?>
+        <?php } ?>
     </div>
+
+    <a href="logout_admin.php" class="logout-btn">Déconnexion</a>
 
 </div>
 
 </body>
 </html>
+
 
 
