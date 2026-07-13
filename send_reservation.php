@@ -105,19 +105,7 @@ $res_status[basename($res_file)] = "pending";
 file_put_contents($status_file, json_encode($res_status));
 
 // ===============================
-// 5️⃣ MAIL AUTOMATIQUE DE CONFIRMATION
-// ===============================
-mail($email, "Votre demande a été reçue - Yo'Service Pro",
-"Bonjour $nom,
-
-Votre demande a bien été reçue.
-Nous allons analyser votre demande et vous envoyer un devis.
-
-Yo'Service Pro",
-"From: $destinataire");
-
-// ===============================
-// 6️⃣ GÉNÉRATION DU DEVIS PDF
+// 5️⃣ GÉNÉRATION DU DEVIS PDF
 // ===============================
 require("devis_pdf.php");
 
@@ -134,39 +122,38 @@ $nom_pdf_devis = creerDevisPDF(
 );
 
 // ===============================
-// 7️⃣ ENVOI DU DEVIS PAR MAIL
+// 6️⃣ ENVOI VIA FORMSPREE (avec PDF)
 // ===============================
-$boundary = md5(time());
-$headers  = "From: $destinataire\r\n";
-$headers .= "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"";
 
-$body  = "--$boundary\r\n";
-$body .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
+$endpoint = "https://formspree.io/f/mvzeoqdk"; // ton endpoint Formspree
 
-$body .= "
-Bonjour $nom,
+$curl = curl_init();
 
-Voici votre devis.
+curl_setopt_array($curl, [
+    CURLOPT_URL => $endpoint,
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POSTFIELDS => [
+        "nom"        => $nom,
+        "email"      => $email,
+        "telephone"  => $telephone,
+        "adresse"    => $adresse,
+        "prestation" => $prestation,
+        "date"       => $date,
+        "message"    => $message,
+        "details_tarif" => $details_tarif,
+        "prix_total" => $prix_total,
 
-Accepter :
-https://yoservicepro.onrender.com/accepter_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
+        // Pièce jointe PDF
+        "file" => new CURLFile("client_data/devis/$email/$nom_pdf_devis", "application/pdf", $nom_pdf_devis)
+    ]
+]);
 
-Refuser :
-https://yoservicepro.onrender.com/refuser_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
-";
-
-$body .= "\r\n\r\n--$boundary\r\n";
-$body .= "Content-Type: application/pdf; name=\"$nom_pdf_devis\"\r\n";
-$body .= "Content-Disposition: attachment; filename=\"$nom_pdf_devis\"\r\n";
-$body .= "Content-Transfer-Encoding: base64\r\n\r\n";
-$body .= chunk_split(base64_encode(file_get_contents("client_data/devis/$email/$nom_pdf_devis")));
-$body .= "--$boundary--";
-
-mail($email, "Votre devis - Yo'Service Pro", $body, $headers);
+$response = curl_exec($curl);
+curl_close($curl);
 
 // ===============================
-// 8️⃣ ADMIN
+// 7️⃣ ADMIN
 // ===============================
 if (!is_dir("admin_data")) mkdir("admin_data");
 
@@ -174,8 +161,23 @@ file_put_contents("admin_data/reservations.txt",
 "Nom: $nom | Email: $email | Tel: $telephone | Prestation: $prestation | Prix: $prix_total\n",
 FILE_APPEND);
 
-echo "<h2>Merci $nom, votre demande a bien été envoyée.</h2>";
-echo "<p>Un devis vous a été envoyé.</p>";
-echo "<a href='index.php'>Retour à l'accueil</a>";
+// ===============================
+// 8️⃣ MESSAGE FINAL STYLÉ
+// ===============================
+echo '
+<div style="max-width:600px;margin:40px auto;padding:30px;background:#fff;border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);font-family:Arial,sans-serif;text-align:center;">
+
+    <h2 style="color:#007bff;">Merci '.$nom.' 🎉</h2>
+    <p style="font-size:16px;color:#333;">Votre demande a bien été envoyée.</p>
+    <p style="font-size:16px;color:#333;">Un devis PDF vous a été envoyé par email.</p>
+
+    <a href="index.php" 
+       style="display:inline-block;margin-top:20px;padding:12px 20px;background:#007bff;
+       color:white;border-radius:8px;text-decoration:none;">
+       Retour à l\'accueil
+    </a>
+</div>
+';
 ?>
 
