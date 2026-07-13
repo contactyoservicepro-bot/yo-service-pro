@@ -2,20 +2,17 @@
 session_start();
 require 'stripe/init.php';
 
-// Clé secrète Stripe
-\Stripe\Stripe::setApiKey('sk_test_51TpD1tItGpuwsD9KsNUdqO9gXbmkC4MRlBXGwZuc1bD7vSpoXvtAOcDgLrw5Z0OABNStpErolZCvFPhGgl3fTg4p00dJkOZcr6');
+\Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
 
-// Vérification des données
-if (!isset($_SESSION['prix_total']) || !isset($_SESSION['prestation']) || !isset($_SESSION['email'])) {
-    echo "Erreur : données manquantes.";
-    exit;
-}
+$email = strtolower($_GET['email']);
+$devis_pdf = $_GET['devis'];
 
-$prix_total = $_SESSION['prix_total'];
-$prestation = $_SESSION['prestation'];
-$email      = $_SESSION['email'];
+// Charger les infos du devis
+$devis_file = "client_data/devis/$email/$devis_pdf";
+$prix_total = 0;
 
-// Création de la session Stripe Checkout
+// Tu peux ajouter un système pour relire le prix depuis le devis si tu veux
+
 $session = \Stripe\Checkout\Session::create([
     'payment_method_types' => ['card'],
     'customer_email' => $email,
@@ -23,18 +20,21 @@ $session = \Stripe\Checkout\Session::create([
         'price_data' => [
             'currency' => 'eur',
             'product_data' => [
-                'name' => "Prestation : $prestation",
+                'name' => "Paiement du devis",
             ],
-            'unit_amount' => $prix_total * 100, // Stripe = centimes
+            'unit_amount' => $prix_total * 100,
         ],
         'quantity' => 1,
     ]],
     'mode' => 'payment',
-    'success_url' => 'https://tonsite.com/paiement_success.php?session_id={CHECKOUT_SESSION_ID}',
-    'cancel_url'  => 'https://tonsite.com/paiement_cancel.php',
+    'success_url' => 'https://yo-service-pro.onrender.com/paiement_success.php?session_id={CHECKOUT_SESSION_ID}',
+    'cancel_url'  => 'https://yo-service-pro.onrender.com/paiement_cancel.php',
+    'metadata' => [
+        'email' => $email,
+        'devis_pdf' => $devis_pdf
+    ]
 ]);
 
-// Redirection vers Stripe Checkout
 header("Location: " . $session->url);
 exit;
 ?>
