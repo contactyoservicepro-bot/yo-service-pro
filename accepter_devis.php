@@ -1,26 +1,36 @@
 <?php
 session_start();
 
-// Vérification du token envoyé dans l’email
-if (!isset($_GET['token']) || !isset($_SESSION['token'])) {
-    echo "<h2>Erreur : lien invalide.</h2>";
-    exit;
-}
+// Récupération des paramètres
+$email = strtolower($_GET['email']);
+$devis_pdf = $_GET['devis'];
 
-if ($_GET['token'] !== $_SESSION['token']) {
-    echo "<h2>Erreur : token incorrect.</h2>";
-    exit;
-}
+// Fichier statut du devis
+$status_file = "client_data/devis/$email/status.json";
 
-// Enregistrement admin (optionnel)
+// Charger le statut actuel
+$status = file_exists($status_file)
+    ? json_decode(file_get_contents($status_file), true)
+    : [];
+
+// Mettre le devis en "accepted"
+$status[$devis_pdf] = "accepted";
+
+// Sauvegarder
+file_put_contents($status_file, json_encode($status));
+
+// Enregistrement admin
+if (!is_dir("admin_data")) mkdir("admin_data");
+
 file_put_contents("admin_data/accepted.txt",
-"Nom: ".$_SESSION['nom']." | Email: ".$_SESSION['email']." | Prestation: ".$_SESSION['prestation']." | Date: ".date("d/m/Y H:i")."\n",
+"Email: $email | Devis: $devis_pdf | Date: ".date("d/m/Y H:i")."\n",
 FILE_APPEND);
 
 // Redirection vers la page de paiement Stripe
-header("Location: paiement.php");
+header("Location: paiement.php?email=" . urlencode($email) . "&devis=" . urlencode($devis_pdf));
 exit;
 ?>
+
 
 
 
