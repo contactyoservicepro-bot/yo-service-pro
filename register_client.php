@@ -56,14 +56,78 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
 <meta charset="UTF-8">
 <title>Espace Client - Inscription</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.register-box {
+    background: white;
+    padding: 40px;
+    width: 420px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.register-box h2 {
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.register-box input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.register-box button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.register-box button:hover {
+    background: #1e7e34;
+}
+
+.register-box p {
+    margin-top: 20px;
+}
+
+.register-box a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.error {
+    color: red;
+    margin-bottom: 10px;
+}
+</style>
+
 </head>
 <body>
 
-<div class="box">
+<div class="register-box">
     <h2>Créer un compte client</h2>
 
-    <?php if(isset($error)) echo "<p style='color:red'>$error</p>"; ?>
+    <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
 
     <form method="POST">
         <input type="text" name="nom" placeholder="Nom complet" required>
@@ -81,3 +145,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </body>
 </html>
+
