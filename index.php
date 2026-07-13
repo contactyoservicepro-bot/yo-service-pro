@@ -16,7 +16,7 @@
 
     <nav class="nav">
         <ul>
-            <li><a href="index.html">Accueil</a></li>
+            <li><a href="index.php">Accueil</a></li>
             <li><a href="services.html">Services</a></li>
             <li><a href="tarifs.html">Tarifs</a></li>
             <li><a href="reservation.html">Réservation</a></li>
