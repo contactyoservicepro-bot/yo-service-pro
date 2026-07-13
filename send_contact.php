@@ -67,6 +67,8 @@ try {
         </div>
     </div>
     ';
+    $mail->SMTPDebug = 2;
+    $mail->Debugoutput = 'html';
 
     $mail->send();
     echo "Votre message a été envoyé avec succès.";
