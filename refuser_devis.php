@@ -1,42 +1,31 @@
 <?php
 session_start();
 
-// Vérification du token envoyé dans l’email
-if (!isset($_GET['token']) || !isset($_SESSION['token'])) {
-    $erreur = "Erreur : lien invalide.";
-} elseif ($_GET['token'] !== $_SESSION['token']) {
-    $erreur = "Erreur : token incorrect.";
-}
+// Récupération des paramètres
+$email = strtolower($_GET['email']);
+$devis_pdf = $_GET['devis'];
 
-if (!isset($erreur)) {
+// Fichier statut du devis
+$status_file = "client_data/devis/$email/status.json";
 
-    // Récupération des infos client
-    $nom        = $_SESSION['nom'];
-    $email      = $_SESSION['email'];
-    $prestation = $_SESSION['prestation'];
+// Charger le statut actuel
+$status = file_exists($status_file)
+    ? json_decode(file_get_contents($status_file), true)
+    : [];
 
-    // Ton email pro
-    $destinataire = "contact.yoservicepro@gmail.com";
+// Mettre le devis en "refused"
+$status[$devis_pdf] = "refused";
 
-    // 1️⃣ MAIL ADMIN
-    $sujet_admin = "Devis refusé par $nom";
-    $contenu_admin = "
-Le client $nom ($email) a refusé le devis pour la prestation :
-$prestation
+// Sauvegarder
+file_put_contents($status_file, json_encode($status));
 
-Date : ".date("d/m/Y H:i")."
-";
+// Enregistrement admin
+if (!is_dir("admin_data")) mkdir("admin_data");
 
-    mail($destinataire, $sujet_admin, $contenu_admin, "From: $destinataire");
-
-    // 2️⃣ ENREGISTREMENT ADMIN
-    file_put_contents("admin_data/refused.txt",
-    "Nom: $nom | Email: $email | Prestation: $prestation | Date: ".date("d/m/Y H:i")."\n",
-    FILE_APPEND);
-}
+file_put_contents("admin_data/refused.txt",
+"Email: $email | Devis: $devis_pdf | Date: ".date("d/m/Y H:i")."\n",
+FILE_APPEND);
 ?>
-
-<!-- 3️⃣ DESIGN HTML ICI -->
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,17 +38,11 @@ Date : ".date("d/m/Y H:i")."
 <body>
 
 <div class="container">
-    <div class="card <?php echo isset($erreur) ? 'error' : 'warning'; ?>">
+    <div class="card warning">
 
-        <?php if (isset($erreur)) { ?>
-            <h1>✖ Erreur</h1>
-            <p><?php echo $erreur; ?></p>
-
-        <?php } else { ?>
-            <h1>✖ Devis refusé</h1>
-            <p>Bonjour <strong><?php echo $nom; ?></strong>, votre refus a été pris en compte.</p>
-            <p>Nous restons disponibles si vous souhaitez modifier votre demande ou obtenir un nouveau devis.</p>
-        <?php } ?>
+        <h1>✖ Devis refusé</h1>
+        <p>Votre décision a été prise en compte.</p>
+        <p>Nous restons disponibles si vous souhaitez modifier votre demande ou obtenir un nouveau devis.</p>
 
         <a href="index.html" class="btn">Retour à l'accueil</a>
     </div>
@@ -67,5 +50,6 @@ Date : ".date("d/m/Y H:i")."
 
 </body>
 </html>
+
 
 
