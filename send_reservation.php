@@ -10,8 +10,7 @@ $prestation = $_POST['prestation'];
 $date       = $_POST['date'];
 $message    = $_POST['message'] ?? "";
 
-$destinataire = "contact.yoservicepro@gmail.com"; // email pro
-
+$destinataire = "contact.yoservicepro@gmail.com";
 
 // ===============================
 // 2️⃣ CALCUL AUTOMATIQUE SELON LA PRESTATION
@@ -70,25 +69,22 @@ if ($prestation === "aide_demenagement") {
     }
 }
 
-
 // ===============================
-// 3️⃣ CRÉATION AUTOMATIQUE DES DOSSIERS CLIENT
+// 3️⃣ CRÉATION DES DOSSIERS CLIENT
 // ===============================
-$client_res_folder   = "client_data/reservations/" . $email;
-$client_devis_folder = "client_data/devis/" . $email;
+$client_res_folder   = "client_data/reservations/$email";
+$client_devis_folder = "client_data/devis/$email";
 
 if (!is_dir($client_res_folder)) mkdir($client_res_folder, 0777, true);
 if (!is_dir($client_devis_folder)) mkdir($client_devis_folder, 0777, true);
 
-// Fichier statut réservation
-$status_file = $client_res_folder . "/status.json";
+$status_file = "$client_res_folder/status.json";
 if (!file_exists($status_file)) file_put_contents($status_file, json_encode([]));
-
 
 // ===============================
 // 4️⃣ ENREGISTREMENT DE LA RÉSERVATION
 // ===============================
-$res_file = $client_res_folder . "/" . time() . ".txt";
+$res_file = "$client_res_folder/" . time() . ".txt";
 
 $res_content = "
 Nom : $nom
@@ -104,35 +100,21 @@ $message
 
 file_put_contents($res_file, $res_content);
 
-// Ajouter statut "pending"
 $res_status = json_decode(file_get_contents($status_file), true);
 $res_status[basename($res_file)] = "pending";
 file_put_contents($status_file, json_encode($res_status));
 
-
 // ===============================
-// 5️⃣ MAIL AUTOMATIQUE DE CONFIRMATION AU CLIENT
+// 5️⃣ MAIL AUTOMATIQUE DE CONFIRMATION
 // ===============================
-$sujet_confirmation = "Votre demande a été reçue - Yo'Service Pro";
+mail($email, "Votre demande a été reçue - Yo'Service Pro",
+"Bonjour $nom,
 
-$contenu_confirmation = "
-Bonjour $nom,
+Votre demande a bien été reçue.
+Nous allons analyser votre demande et vous envoyer un devis.
 
-Votre demande de prestation a bien été reçue.
-
-Nous allons analyser votre demande et vous envoyer :
-- un devis détaillé
-- une facture une fois le devis accepté.
-
-Prestation : $prestation
-Date souhaitée : $date
-
-Merci pour votre confiance.
-Yo'Service Pro
-";
-
-mail($email, $sujet_confirmation, $contenu_confirmation, "From: $destinataire");
-
+Yo'Service Pro",
+"From: $destinataire");
 
 // ===============================
 // 6️⃣ GÉNÉRATION DU DEVIS PDF
@@ -151,15 +133,9 @@ $nom_pdf_devis = creerDevisPDF(
     $message
 );
 
-// Déplacer le devis dans le dossier du client
-rename("devis/" . $nom_pdf_devis, $client_devis_folder . "/" . $nom_pdf_devis);
-
-
 // ===============================
-// 7️⃣ ENVOI DU MAIL AVEC LE DEVIS + LIENS ACCEPTER / REFUSER
+// 7️⃣ ENVOI DU DEVIS PAR MAIL
 // ===============================
-$sujet_devis = "Votre devis - Yo'Service Pro";
-
 $boundary = md5(time());
 $headers  = "From: $destinataire\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
@@ -171,74 +147,35 @@ $body .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
 $body .= "
 Bonjour $nom,
 
-Vous trouverez ci-joint votre devis pour la prestation suivante :
+Voici votre devis.
 
-Prestation : $prestation
-Date souhaitée : $date
+Accepter :
+https://yoservicepro.onrender.com/accepter_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
 
-Veuillez choisir une option :
-
-Accepter le devis :
-https://votresite.com/accepter_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
-
-Refuser le devis :
-https://votresite.com/refuser_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
-
-Merci pour votre confiance.
-Yo'Service Pro
+Refuser :
+https://yoservicepro.onrender.com/refuser_devis.php?email=" . urlencode($email) . "&devis=" . urlencode($nom_pdf_devis) . "
 ";
 
 $body .= "\r\n\r\n--$boundary\r\n";
 $body .= "Content-Type: application/pdf; name=\"$nom_pdf_devis\"\r\n";
 $body .= "Content-Disposition: attachment; filename=\"$nom_pdf_devis\"\r\n";
 $body .= "Content-Transfer-Encoding: base64\r\n\r\n";
-$body .= chunk_split(base64_encode(file_get_contents($client_devis_folder . "/" . $nom_pdf_devis)));
+$body .= chunk_split(base64_encode(file_get_contents("client_data/devis/$email/$nom_pdf_devis")));
 $body .= "--$boundary--";
 
-mail($email, $sujet_devis, $body, $headers);
-
-
-// ===============================
-// 8️⃣ MAIL POUR TOI (ADMIN)
-// ===============================
-$sujet_admin = "Nouvelle demande de prestation - Yo'Service Pro";
-
-$contenu_admin = "
-Nouvelle demande reçue :
-
-Nom : $nom
-Téléphone : $telephone
-Email : $email
-Adresse : $adresse
-Prestation : $prestation
-Date souhaitée : $date
-
-Message :
-$message
-
-Tarif :
-$details_tarif
-Prix total : $prix_total €
-";
-
-mail($destinataire, $sujet_admin, $contenu_admin, "From: $email");
-
+mail($email, "Votre devis - Yo'Service Pro", $body, $headers);
 
 // ===============================
-// 9️⃣ ENREGISTREMENT DANS admin_data/
+// 8️⃣ ADMIN
 // ===============================
 if (!is_dir("admin_data")) mkdir("admin_data");
 
 file_put_contents("admin_data/reservations.txt",
-"Nom: $nom | Email: $email | Tel: $telephone | Prestation: $prestation | Date: $date | Prix: $prix_total | Message: $message\n",
+"Nom: $nom | Email: $email | Tel: $telephone | Prestation: $prestation | Prix: $prix_total\n",
 FILE_APPEND);
 
-
-// ===============================
-// 🔟 MESSAGE DE CONFIRMATION SUR LE SITE
-// ===============================
 echo "<h2>Merci $nom, votre demande a bien été envoyée.</h2>";
-echo "<p>Un email de confirmation et un devis vous ont été envoyés.</p>";
+echo "<p>Un devis vous a été envoyé.</p>";
 echo "<a href='index.php'>Retour à l'accueil</a>";
-
 ?>
+
