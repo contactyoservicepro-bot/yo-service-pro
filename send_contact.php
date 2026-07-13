@@ -1,43 +1,77 @@
 <?php
-// Sécurisation basique
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'phpmailer/PHPMailer.php';
+require 'phpmailer/SMTP.php';
+require 'phpmailer/Exception.php';
+
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: contact.html");
     exit;
 }
 
-// Récupération des données
 $nom       = htmlspecialchars($_POST['nom']);
 $telephone = htmlspecialchars($_POST['telephone']);
 $email     = htmlspecialchars($_POST['email']);
 $message   = htmlspecialchars($_POST['message']);
 
-// Adresse où tu veux recevoir les messages
-$destinataire = "contact.yoservicepro@gmail.com";  // 🔥 Mets ton vrai email ici
+$mail = new PHPMailer(true);
 
-// Sujet du mail
-$sujet = "Nouveau message depuis le formulaire de contact";
+try {
+    // SMTP SendGrid
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.sendgrid.net';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'apikey'; // obligatoire
+    $mail->Password   = getenv("SENDGRID_API_KEY");
+    $mail->SMTPSecure = 'tls';
+    $mail->Port       = 587;
 
-// Contenu du mail
-$contenu = "
-Vous avez reçu un nouveau message depuis votre site Yo'Service Pro :
+    // Expéditeur
+    $mail->setFrom('contact@yoservicepro.fr', 'YoService Pro');
 
-Nom : $nom
-Téléphone : $telephone
-Email : $email
+    // Destinataire
+    $mail->addAddress('contact.yoservicepro@gmail.com');
 
-Message :
-$message
-";
+    // Email HTML
+    $mail->isHTML(true);
+    $mail->Subject = "Nouveau message depuis le formulaire de contact";
 
-// En-têtes du mail
-$headers = "From: $email\r\n";
-$headers .= "Reply-To: $email\r\n";
-$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $mail->Body = '
+    <div style="font-family: Arial, sans-serif; background:#f7f7f7; padding:20px;">
+        <div style="max-width:600px; margin:auto; background:white; padding:30px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
 
-// Envoi du mail
-if (mail($destinataire, $sujet, $contenu, $headers)) {
+            <h2 style="color:#007bff; margin-bottom:20px;">📩 Nouveau message reçu</h2>
+
+            <p style="font-size:16px; color:#333;">
+                Vous avez reçu un nouveau message depuis le site <strong>Yo\'Service Pro</strong>.
+            </p>
+
+            <div style="margin-top:25px;">
+                <p style="font-size:15px;"><strong>Nom :</strong> '.$nom.'</p>
+                <p style="font-size:15px;"><strong>Téléphone :</strong> '.$telephone.'</p>
+                <p style="font-size:15px;"><strong>Email :</strong> '.$email.'</p>
+            </div>
+
+            <div style="margin-top:25px; padding:15px; background:#f0f4ff; border-left:4px solid #007bff; border-radius:6px;">
+                <p style="font-size:15px; color:#333; white-space:pre-line;">
+                    '.$message.'
+                </p>
+            </div>
+
+            <p style="margin-top:30px; font-size:14px; color:#777;">
+                Ce message a été envoyé automatiquement depuis le formulaire de contact Yo\'Service Pro.
+            </p>
+
+        </div>
+    </div>
+    ';
+
+    $mail->send();
     echo "Votre message a été envoyé avec succès.";
-} else {
+
+} catch (Exception $e) {
     echo "Erreur : le message n'a pas pu être envoyé.";
 }
 ?>
