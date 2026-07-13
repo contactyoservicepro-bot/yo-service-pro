@@ -259,7 +259,7 @@ body {
         <?php } ?>
     </div>
 
-    <a href="logout_admin.php" class="logout-btn">Déconnexion</a>
+    <a href="logout.php" class="logout-btn">Déconnexion</a>
 
 </div>
 
