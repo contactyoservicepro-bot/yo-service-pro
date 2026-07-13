@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yo'Service Pro - Services à domicile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+    <a href="index.html" class="logo">
+        <img src="logo.png" alt="YoService Pro">
+    </a>
+
+    <nav class="nav">
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="tarifs.html">Tarifs</a></li>
+            <li><a href="reservation.html">Réservation</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="apropos.html">À propos</a></li>
+        </ul>
+    </nav>
+
+    <div class="client-buttons">
+        <a href="login_client.php" class="btn-client-nav">Mon espace client</a>
+        <a href="register_client.php" class="btn-register">S'inscrire</a>
+    </div>
+    </header>
+
+<section class="reservation">
+    <h2>Réserver une prestation</h2>
+    <p>Remplissez le formulaire ci-dessous pour réserver votre service à domicile.</p>
+
+    <form action="send_reservation.php" method="POST" enctype="multipart/form-data" class="reservation-form">
+
+        <label for="nom">Nom complet :</label>
+        <input type="text" id="nom" name="nom" required>
+
+        <label for="telephone">Téléphone :</label>
+        <input type="tel" id="telephone" name="telephone" required>
+
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="adresse">Adresse complète :</label>
+        <input type="text" id="adresse" name="adresse" required>
+
+        <label for="prestation">Type de prestation :</label>
+        <select id="prestation" name="prestation" required>
+            <option value="">-- Sélectionnez --</option>
+            <option value="nettoyage">Nettoyage à domicile</option>
+            <option value="aide_domicile">Aide à domicile</option>
+            <option value="aide_demenagement">Aide déménagement</option>
+        </select>
+
+        <!-- NETTOYAGE -->
+        <div id="bloc_nettoyage" class="hidden">
+            <label for="materiel">Matériel utilisé :</label>
+            <select id="materiel" name="materiel">
+                <option value="">-- Sélectionnez --</option>
+                <option value="yo">Matériel Yo'Service Pro (25€/h)</option>
+                <option value="client">Matériel du client (40€/h)</option>
+            </select>
+
+            <label for="heures_nettoyage">Nombre d'heures souhaitées :</label>
+            <input type="number" id="heures_nettoyage" name="heures_nettoyage" min="1">
+        </div>
+
+        <!-- AIDE À DOMICILE -->
+        <div id="bloc_aide_domicile" class="hidden">
+            <label for="type_aide">Type d'aide :</label>
+            <select id="type_aide" name="type_aide">
+                <option value="">-- Sélectionnez --</option>
+                <option value="simple">Aide simple (20€/h)</option>
+                <option value="renforcee">Aide renforcée (30€/h)</option>
+                <option value="forfait3h">Forfait 3h (70€)</option>
+            </select>
+
+            <label for="heures_aide">Nombre d'heures (si aide simple ou renforcée) :</label>
+            <input type="number" id="heures_aide" name="heures_aide" min="1">
+        </div>
+
+        <!-- AIDE DÉMÉNAGEMENT -->
+        <div id="bloc_aide_demenagement" class="hidden">
+            <label for="forfait_demenagement">Forfait déménagement :</label>
+            <select id="forfait_demenagement" name="forfait_demenagement">
+                <option value="">-- Sélectionnez --</option>
+                <option value="forfait3h">Forfait 3h (150€)</option>
+                <option value="forfait5h">Forfait 5h (230€)</option>
+            </select>
+        </div>
+
+        <label for="date">Date souhaitée :</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="message">Message (facultatif) :</label>
+        <textarea id="message" name="message" rows="4" placeholder="Précisez vos besoins..."></textarea>
+
+        <label for="fichiers">Photos ou documents (optionnel) :</label>
+        <input type="file" id="fichiers" name="fichiers[]" accept="image/*,.pdf,.doc,.docx" multiple>
+
+        <button type="submit" class="btn">Envoyer la réservation</button>
+    </form>
+</section>
+
+<footer>
+    <div class="footer-links">
+        <a href="contact.html">Contact</a>
+        <a href="mentions.html">Mentions légales</a>
+        <a href="login_admin.php" class="footer-admin">Admin</a>
+    </div>
+    <p>© 2026 Yo'Service Pro – Tous droits réservés</p>
+</footer>
+
+<script>
+    const prestation = document.getElementById("prestation");
+    const blocNettoyage = document.getElementById("bloc_nettoyage");
+    const blocAideDomicile = document.getElementById("bloc_aide_domicile");
+    const blocAideDemenagement = document.getElementById("bloc_aide_demenagement");
+
+    prestation.addEventListener("change", () => {
+        blocNettoyage.classList.add("hidden");
+        blocAideDomicile.classList.add("hidden");
+        blocAideDemenagement.classList.add("hidden");
+
+        if (prestation.value === "nettoyage") blocNettoyage.classList.remove("hidden");
+        if (prestation.value === "aide_domicile") blocAideDomicile.classList.remove("hidden");
+        if (prestation.value === "aide_demenagement") blocAideDemenagement.classList.remove("hidden");
+    });
+</script>
+
+</body>
+</html>
+
+

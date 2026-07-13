@@ -1,0 +1,780 @@
+/* 🌐 GLOBAL */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f9fc;
+    color: #333;
+}
+
+
+/* 🔵 HEADER */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: white;
+}
+
+.header .logo img {
+    height: 100px;
+}
+
+.nav ul {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.btn-client-nav {
+    background: #007bff;
+    color: white !important;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-client-nav:hover {
+    background: #005fcc;
+}
+
+.client-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+/* Bouton S'inscrire */
+.btn-register {
+    background: #28a745; /* vert */
+    color: white !important;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-register:hover {
+    background: #218838;
+}
+
+
+
+/* 🔵 MENU */
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #1e90ff;
+    font-size: 1.05em;
+    transition: 0.3s;
+}
+
+.menu ul li a:hover {
+    color: #187bcd;
+    text-decoration: underline;
+}
+
+
+/* 🖼️ HERO */
+.hero {
+    background-color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.hero-img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.hero h2 {
+    color: #1e90ff;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+/* 🔘 BUTTONS — VERSION PRO PARFAITE */
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Boutons identiques */
+.btn-primary,
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 200px;          /* 🔥 EXACTEMENT la même largeur */
+    height: 50px;          /* 🔥 EXACTEMENT la même hauteur */
+
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition: 0.3s ease;
+}
+
+/* Bouton bleu */
+.btn-primary {
+    background-color: #1e90ff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #187bcd;
+}
+
+/* Bouton gris */
+.btn-secondary {
+    background-color: #333;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #555;
+}
+
+
+
+
+
+/* 🧹 PRESENTATION */
+.presentation {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f0f4f8;
+}
+
+.presentation h3 {
+    color: #1e90ff;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.presentation p {
+    max-width: 700px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+}
+
+.section-img {
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    margin-top: 15px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+/* 🧰 PRESTATIONS */
+.services {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: white;
+}
+
+.services h3 {
+    color: #1e90ff;
+    font-size: 2.2em;
+    margin-bottom: 40px;
+}
+
+/* Grille parfaitement alignée */
+.service-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 40px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+/* Carte prestation premium */
+.service-item {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 25px;
+    width: 320px;
+    height: 430px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+    transition: 0.3s;
+}
+
+.service-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+/* Images uniformisées */
+.service-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* Titres & textes */
+.service-item h4 {
+    color: #1e90ff;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+.service-item p {
+    font-size: 1em;
+    line-height: 1.5;
+    margin-top: auto;
+}
+
+/* 💶 TARIFS — PREMIUM */
+/* 🌟 HERO TARIFS */
+.hero-tarifs {
+    position: relative;
+    height: 350px;
+    background-image: url('hero-bg.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Voile sombre */
+.hero-tarifs::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    border-radius: 0;
+}
+
+/* Contenu */
+.hero-content {
+    position: relative;
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.hero-content h2 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* Bouton */
+.btn-hero {
+    display: inline-block;
+    background-color: #1e90ff;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-hero:hover {
+    background-color: #187bcd;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 25px 20px;
+    background-color: #f0f4f8;
+    margin-top: 40px;
+}
+
+.footer-links {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    margin: 0 15px;
+    color: #1e90ff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: #187bcd;
+    text-decoration: underline;
+}
+
+footer p {
+    color: #555;
+    font-size: 0.95em;
+}
+
+.footer-admin {
+    opacity: 0.4;                /* semi-transparent */
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 15px;
+    transition: 0.3s;
+}
+
+.footer-admin:hover {
+    opacity: 1;                  /* visible quand tu passes la souris */
+    color: #1e90ff;
+    text-decoration: underline;
+}
+
+
+
+
+/* 🧾 SECTION RÉSERVATION */
+.reservation {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.reservation h2 {
+    color: #1e90ff;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.reservation p {
+    font-size: 1.1em;
+    margin-bottom: 40px;
+}
+
+/* 🧩 FORMULAIRE */
+.reservation-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.reservation-form label {
+    display: block;
+    font-weight: 600;
+    margin-top: 20px;
+    color: #333;
+}
+
+.reservation-form input,
+.reservation-form select,
+.reservation-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* 📁 UPLOAD FICHIERS */
+.reservation-form input[type="file"] {
+    background: #f0f4f8;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+/* 🔘 BOUTON */
+.reservation-form button,
+.btn {
+    margin-top: 30px;
+    width: 100%;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.reservation-form button:hover,
+.btn:hover {
+    background-color: #187bcd;
+}
+
+/* 🟦 BLOCS CONDITIONNELS */
+.hidden {
+    display: none;
+}
+
+/* 📞 SECTION CONTACT */
+.contact {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.contact h2 {
+    color: #1e90ff;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.contact p {
+    font-size: 1.1em;
+    margin-bottom: 40px;
+}
+
+/* 🧩 FORMULAIRE CONTACT */
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.contact-form label {
+    display: block;
+    font-weight: 600;
+    margin-top: 20px;
+    color: #333;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* 🔘 BOUTON */
+.contact-form button {
+    margin-top: 30px;
+    width: 100%;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.contact-form button:hover {
+    background-color: #187bcd;
+}
+
+/* 💶 SECTION TARIFS */
+.tarifs {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.tarifs h2 {
+    color: #1e90ff;
+    font-size: 2.3em;
+    margin-bottom: 10px;
+}
+
+.tarifs p {
+    font-size: 1.1em;
+    margin-bottom: 40px;
+}
+
+/* Conteneur des blocs */
+.tarifs-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Bloc tarif */
+.tarif-box {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e6e9ef;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.tarif-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+}
+
+.tarif-box h3 {
+    color: #1e90ff;
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    border-left: 5px solid #1e90ff;
+    padding-left: 10px;
+}
+
+
+.tarif-box .description {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.tarif-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.tarif-box ul li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: #1e90ff; /* bleu Yo'Service */
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+}
+
+
+.tarif-box ul li:last-child {
+    border-bottom: none;
+}
+
+/* 🧹 SECTION SERVICES */
+.services {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.services h2 {
+    color: #1e90ff;
+    font-size: 2.3em;
+    margin-bottom: 10px;
+}
+
+.services p {
+    font-size: 1.1em;
+    margin-bottom: 40px;
+}
+
+/* Conteneur */
+.services-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Bloc service */
+.service-box {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e6e9ef;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.service-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+}
+
+.service-box h3 {
+    color: #1e90ff;
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    border-left: 5px solid #1e90ff;
+    padding-left: 10px;
+}
+
+.service-box p {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 1.05em;
+}
+
+/* Bouton */
+.btn-service {
+    display: inline-block;
+    background-color: #1e90ff;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-service:hover {
+    background-color: #187bcd;
+}
+
+/* 🧩 SECTION A PROPOS */
+.apropos {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.apropos h2 {
+    color: #1e90ff;
+    font-size: 2.3em;
+    margin-bottom: 10px;
+}
+
+.apropos .intro {
+    font-size: 1.15em;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    color: #555;
+}
+
+/* Conteneur */
+.apropos-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Bloc */
+.apropos-box {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e6e9ef;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.apropos-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+}
+
+.apropos-box h3 {
+    color: #1e90ff;
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    border-left: 5px solid #1e90ff;
+    padding-left: 10px;
+}
+
+.apropos-box p,
+.apropos-box ul {
+    color: #555;
+    font-size: 1.05em;
+}
+
+.apropos-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.apropos-box ul li {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* 📘 SECTION MENTIONS LÉGALES */
+.mentions {
+    text-align: center;
+    padding: 70px 20px;
+    background-color: #f7f9fc;
+}
+
+.mentions h2 {
+    color: #1e90ff;
+    font-size: 2.3em;
+    margin-bottom: 40px;
+}
+
+.mentions-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.mentions-box {
+    background: white;
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e6e9ef;
+    text-align: left;
+}
+
+.mentions-box h3 {
+    color: #1e90ff;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    border-left: 5px solid #1e90ff;
+    padding-left: 10px;
+}
+
+.mentions-box p {
+    color: #555;
+    font-size: 1.05em;
+    line-height: 1.6em;
+}
+
+
